@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(node --version)",
+      "PowerShell(npm --version)",
+      "PowerShell($base = \"C:\\\\Users\\\\MichaelAponte\\\\Documents\\\\Visual\\\\Batalla Naval\"; New-Item -ItemType Directory -Path \"$base\\\\legacy\" -Force | Out-Null; Move-Item -Path \"$base\\\\Batalla Naval\\\\index.html\",\"$base\\\\Batalla Naval\\\\battle.js\",\"$base\\\\Batalla Naval\\\\battle.css\" -Destination \"$base\\\\legacy\\\\\" -Force; Remove-Item -Path \"$base\\\\Batalla Naval\" -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item -Path \"$base\\\\__MACOSX\" -Recurse -Force -ErrorAction SilentlyContinue; Get-ChildItem $base)",
+      "mcp__Claude_Preview__preview_start"
+    ]
+  }
+}

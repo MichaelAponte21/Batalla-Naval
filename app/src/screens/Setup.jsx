@@ -77,6 +77,8 @@ export default function Setup() {
                       <motion.button
                         key={s.uid}
                         onClick={() => !placed && selectShip(s.uid)}
+                        onDragStart={() => !placed && selectShip(s.uid)}
+                        draggable={!placed}
                         disabled={placed}
                         className="flex items-center gap-1 px-2 py-1 panel"
                         style={{

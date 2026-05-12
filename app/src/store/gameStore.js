@@ -112,8 +112,6 @@ export const useGameStore = create((set, get) => ({
     const s = get();
 
     if (s.isLocal2P) {
-      // P2 just placed their ships (in playerBoard/playerFleet).
-      // P1 attacks first: playerBoard = P1's placement, enemyBoard = P2's placement.
       set({
         screen: SCREENS.BATTLE,
         playerBoard: s.p1SetupBoard,
@@ -128,6 +126,7 @@ export const useGameStore = create((set, get) => ({
         handoffPending: false,
         battleStats: initialBattleStats(),
       });
+      setTimeout(() => get().pushEvent('Flotas desplegadas. Jugador 1 inicia el ataque.', 'radio'), 200);
       return;
     }
 
@@ -140,6 +139,7 @@ export const useGameStore = create((set, get) => ({
       ai: createAIState(difficulty),
       battleStats: initialBattleStats(),
     });
+    setTimeout(() => get().pushEvent('Flota desplegada. Esperando órdenes de ataque.', 'radio'), 200);
   },
 
   toggleMute: () => set(s => {
@@ -215,7 +215,9 @@ export const useGameStore = create((set, get) => ({
   // ============ ANIMS ============
   pushAnim: (anim) => set(s => ({ shotAnims: [...s.shotAnims, { ...anim, id: newId() }] })),
   consumeAnim: (id) => set(s => ({ shotAnims: s.shotAnims.filter(a => a.id !== id) })),
-  pushEvent: (msg) => set(s => ({ events: [{ id: newId(), msg, ts: Date.now() }, ...s.events].slice(0, 8) })),
+  pushEvent: (msg, category = 'shot') => set(s => ({
+    events: [{ id: newId(), msg, ts: Date.now(), category }, ...s.events].slice(0, 14)
+  })),
   clearZoomTarget: () => set({ zoomTarget: null }),
   clearConfetti: () => set({ showConfetti: false }),
   clearNewAchievements: () => set({ newAchievements: [] }),
@@ -269,10 +271,25 @@ export const useGameStore = create((set, get) => ({
 
     set(update);
     get().pushAnim({ side: 'enemy', x, y, type: result, sunk: !!sunkShip });
-    get().pushEvent(result === 'hit' ? (sunkShip ? `¡Hundiste el ${sunkShip.name}!` : 'Impacto confirmado.') : 'Disparo al agua.');
 
-    if (!update.winner) {
-      if (result === 'miss') setTimeout(() => get().endPlayerTurn(), 700);
+    if (result === 'hit') {
+      if (sunkShip) {
+        get().pushEvent(`¡Hundiste el ${sunkShip.name}!`);
+        get().pushEvent('¡Barco enemigo hundido! Zona despejada.', 'radio');
+      } else {
+        get().pushEvent('Impacto confirmado.');
+        if (s.battleStats.totalHitsStreak === 0) {
+          get().pushEvent('¡Tenemos contacto con objetivo! Ajusten puntería.', 'radio');
+        }
+      }
+    } else {
+      get().pushEvent('Disparo al agua.');
+    }
+
+    if (update.winner) {
+      get().pushEvent('Enemigo neutralizado. El océano es nuestro.', 'radio');
+    } else if (result === 'miss') {
+      setTimeout(() => get().endPlayerTurn(), 700);
     }
     return { result, sunkShip };
   },
@@ -332,7 +349,17 @@ export const useGameStore = create((set, get) => ({
     }
     set(update);
     get().pushAnim({ side: 'player', x, y, type: result, sunk: !!sunkShip });
-    get().pushEvent(result === 'hit' ? (sunkShip ? `Hundieron tu ${sunkShip.name}.` : 'Te golpearon.') : 'El enemigo falló.');
+
+    if (result === 'hit') {
+      if (sunkShip) {
+        get().pushEvent(`Hundieron tu ${sunkShip.name}.`, 'alert');
+        get().pushEvent('¡Daños críticos! Solicitamos refuerzos.', 'alert');
+      } else {
+        get().pushEvent('Impacto recibido en nuestra flota.', 'alert');
+      }
+    } else {
+      get().pushEvent('Disparo enemigo al agua.');
+    }
 
     if (!update.winner) setTimeout(() => get().endEnemyTurn(result), 800);
   },
@@ -345,7 +372,7 @@ export const useGameStore = create((set, get) => ({
     if (s.mode === 'advanced' && (s.turnCount + 1) % TURNS_PER_CHANGE === 0) {
       const next = rollWeather(s.weatherId);
       update.weatherId = next;
-      get().pushEvent(`Clima cambia: ${WEATHERS[next].name}.`);
+      get().pushEvent(`Clima cambia: ${WEATHERS[next].name}.`, 'system');
     }
     set(update);
   },

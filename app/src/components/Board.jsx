@@ -40,7 +40,7 @@ export default function Board({
   return (
     <div
       className={`relative ${className}`}
-      style={{ width: '100%', maxWidth: '460px', margin: '0 auto' }}
+      style={{ width: '100%', maxWidth: '560px', margin: '0 auto' }}
     >
       {/* Column labels */}
       <div className="flex" style={{ paddingLeft: '28px' }}>

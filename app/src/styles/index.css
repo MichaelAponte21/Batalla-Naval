@@ -262,6 +262,115 @@ body {
 .skin-paper   .grid-cell.ship-own { background: linear-gradient(135deg, #e8d9b0, #c9a96e); }
 .skin-stealth .grid-cell.ship-own { background: #0d0d0d; box-shadow: none; }
 
+/* ============ PERSISTENT FIRE ON HIT CELLS ============ */
+@keyframes fire-flicker {
+  0%   { opacity: 0.45; transform: scale(0.92) translateY(1px); }
+  30%  { opacity: 0.75; transform: scale(1.04) translateY(-2px); }
+  60%  { opacity: 0.55; transform: scale(0.97) translateY(0); }
+  100% { opacity: 0.60; transform: scale(1) translateY(1px); }
+}
+
+@keyframes smoke-drift {
+  0%   { opacity: 0.35; transform: translateY(0) scale(1); }
+  100% { opacity: 0;    transform: translateY(-8px) scale(1.4); }
+}
+
+.grid-cell.hit::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: 2px;
+  background: radial-gradient(circle at 50% 65%,
+    rgba(255,120,0,0.65) 0%,
+    rgba(220,50,0,0.40) 35%,
+    transparent 70%);
+  animation: fire-flicker 0.65s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.grid-cell.hit::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 30%,
+    rgba(160,160,160,0.25) 0%,
+    transparent 70%);
+  animation: smoke-drift 1.2s ease-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ============ ACTIVE / PASSIVE BOARD STATES ============ */
+.board-active {
+  transition: transform 0.45s cubic-bezier(0.22,1,0.36,1), filter 0.45s ease;
+  transform: scale(1.025);
+  filter: brightness(1.08);
+}
+.board-passive {
+  transition: transform 0.45s cubic-bezier(0.22,1,0.36,1), filter 0.45s ease;
+  transform: scale(0.96);
+  filter: brightness(0.70) saturate(0.65);
+}
+
+/* ============ GLASSMORPHISM ENHANCED ============ */
+.glass-panel {
+  background: rgba(8, 16, 28, 0.75);
+  backdrop-filter: blur(14px) saturate(1.4);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+  border-radius: 4px;
+}
+
+/* ============ TACTICAL LOG TERMINAL ============ */
+.tactical-log {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 0.68rem;
+  line-height: 1.5;
+  background: rgba(0,0,0,0.72);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(var(--accent-rgb, 201,169,110), 0.25);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.tactical-log-entry { padding: 1px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tactical-log-entry.cat-shot   { color: #c9a96e; }
+.tactical-log-entry.cat-radio  { color: #6dc96d; }
+.tactical-log-entry.cat-system { color: #7799aa; }
+.tactical-log-entry.cat-alert  { color: #ff6a6a; }
+
+.theme-advanced .tactical-log { border-color: rgba(0,229,255,0.22); }
+.theme-advanced .tactical-log-entry.cat-shot   { color: #00e5ff; }
+.theme-advanced .tactical-log-entry.cat-radio  { color: #6dc96d; }
+.theme-advanced .tactical-log-entry.cat-system { color: #aaccdd; }
+.theme-advanced .tactical-log-entry.cat-alert  { color: #ff6a00; }
+
+/* ============ PROJECTILE ANIMATION ============ */
+@keyframes projectile-fall {
+  0%   { opacity: 0; transform: translateY(-32px) scale(0.4); }
+  40%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(0) scale(1.2); }
+}
+
+.projectile-incoming {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.projectile-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  animation: projectile-fall 0.38s ease-in forwards;
+}
+
 /* ============ DIFFICULTY BADGE ============ */
 .diff-badge {
   display: inline-flex;

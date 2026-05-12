@@ -23,6 +23,9 @@ export default function Cell({
       onClick={disabled ? undefined : () => onClick?.(x, y)}
       onMouseEnter={() => onHover?.(x, y)}
       onMouseLeave={() => onLeave?.(x, y)}
+      onDragOver={(e) => { e.preventDefault(); onHover?.(x, y); }}
+      onDragEnter={(e) => { e.preventDefault(); onHover?.(x, y); }}
+      onDrop={(e) => { e.preventDefault(); if (!disabled) onClick?.(x, y); }}
       whileTap={disabled ? undefined : { scale: 0.94 }}
       layout={false}
     >
